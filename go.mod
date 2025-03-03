@@ -1,6 +1,6 @@
 module github.com/verloop/gocloak/v13
 
-go 1.23
+go 1.22.0
 
 require (
 	github.com/go-resty/resty/v2 v2.15.3
