@@ -20,11 +20,11 @@ Benchmarks can be found [here](https://nerzal.github.io/gocloak/dev/bench/)
 
 ## Contribution
 
-(WIP) <https://github.com/Nerzal/gocloak/wiki/Contribute>
+(WIP) <https://github.com/verloop/gocloak/wiki/Contribute>
 
 ## Changelog
 
-For release notes please consult the specific releases [here](https://github.com/Nerzal/gocloak/releases)
+For release notes please consult the specific releases [here](https://github.com/verloop/gocloak/releases)
 
 
 ## Usage
@@ -32,13 +32,13 @@ For release notes please consult the specific releases [here](https://github.com
 ### Installation
 
 ```shell
-go get github.com/Nerzal/gocloak/v13
+go get github.com/verloop/gocloak/v13
 ```
 
 ### Importing
 
 ```go
- import "github.com/Nerzal/gocloak/v13"
+ import "github.com/verloop/gocloak/v13"
 ```
 
 ### Create New User
