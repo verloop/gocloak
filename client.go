@@ -4507,3 +4507,21 @@ func (g *GoCloak) GetUsersManagementPermissions(ctx context.Context, accessToken
 
 	return &result, nil
 }
+
+// PartialImport allows importing a realm partially
+func (g *GoCloak) PartialImport(ctx context.Context, accessToken string, realm RealmRepresentation) (*PartialImportResult, error) {
+	const errMessage = "could not import realm partially"
+
+	var result PartialImportResult
+
+	resp, err := g.GetRequestWithBearerAuth(ctx, accessToken).
+		SetResult(&result).
+		SetBody(realm).
+		Post(g.getAdminRealmURL(PString(realm.Realm), "partialImport"))
+
+	if err := checkForError(resp, err, errMessage); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}

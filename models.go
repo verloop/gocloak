@@ -1445,6 +1445,12 @@ type GetClientUserSessionsParams struct {
 	Max   *int `json:"max,string,omitempty"`
 }
 
+type PartialImportResult struct {
+	Overwritten *int32 `json:"overwritten,omitempty"`
+	Added       *int32 `json:"added,omitempty"`
+	Skipped     *int32 `json:"skipped,omitempty"`
+}
+
 // prettyStringStruct returns struct formatted into pretty string
 func prettyStringStruct(t interface{}) string {
 	json, err := json.MarshalIndent(t, "", "\t")
