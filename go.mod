@@ -1,4 +1,4 @@
-module github.com/verloop/gocloak/v13
+module github.com/verloop/gocloak
 
 go 1.22.0
 

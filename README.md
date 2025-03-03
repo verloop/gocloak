@@ -32,13 +32,13 @@ For release notes please consult the specific releases [here](https://github.com
 ### Installation
 
 ```shell
-go get github.com/verloop/gocloak/v13
+go get github.com/verloop/gocloak
 ```
 
 ### Importing
 
 ```go
- import "github.com/verloop/gocloak/v13"
+ import "github.com/verloop/gocloak"
 ```
 
 ### Create New User

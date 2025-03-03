@@ -17,3 +17,6 @@
 *.out
 
 \.idea/
+
+# MacOS
+.DS_Store
