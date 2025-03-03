@@ -3374,6 +3374,17 @@ func (g *GoCloak) GetResourceServer(ctx context.Context, token, realm, idOfClien
 	return result, nil
 }
 
+// ImportResourceServer imports a resource server
+func (g *GoCloak) ImportResourceServer(ctx context.Context, token, realm, idOfClient string, resourceServer ResourceServerRepresentation) error {
+	const errMessage = "could not import resource server"
+
+	resp, err := g.GetRequestWithBearerAuth(ctx, token).
+		SetBody(resourceServer).
+		Post(g.getAdminRealmURL(realm, "clients", idOfClient, "authz", "resource-server", "import"))
+
+	return checkForError(resp, err, errMessage)
+}
+
 // UpdateResource updates a resource associated with the client, using access token from admin
 func (g *GoCloak) UpdateResource(ctx context.Context, token, realm, idOfClient string, resource ResourceRepresentation) error {
 	const errMessage = "could not update resource"
