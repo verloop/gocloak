@@ -2121,6 +2121,21 @@ func (g *GoCloak) GetClients(ctx context.Context, token, realm string, params Ge
 	return result, nil
 }
 
+// GetClientByClientID gets a client by it's client_id (not to be confused with it's UUID-based id)
+func (g *GoCloak) GetClientByClientID(ctx context.Context, token, realm, clientID string) (*Client, error) {
+	var result []*Client
+
+	result, err := g.GetClients(ctx, token, realm, GetClientsParams{ClientID: &clientID})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) > 0 {
+		return result[0], nil
+	}
+	return &Client{}, nil
+}
+
 // GetClientManagementPermissions returns whether client Authorization permissions have been initialized or not and a reference
 // to the managed permissions
 func (g *GoCloak) GetClientManagementPermissions(ctx context.Context, token, realm string, idOfClient string) (*ManagementPermissionRepresentation, error) {
