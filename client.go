@@ -353,8 +353,8 @@ func WithClientCredentials(clientID, clientSecret, realm string) func(g *GoCloak
 		}
 
 		oauth2Client := clientCredentialsConfig.Client(context.Background())
-
-		g.restyClient.SetTransport(oauth2Client.Transport)
+		resty := resty.NewWithClient(oauth2Client)
+		g.SetRestyClient(resty)
 	}
 }
 
