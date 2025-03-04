@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/mod/semver"
+	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/verloop/gocloak/pkg/jwx"
 )
@@ -336,6 +337,24 @@ func SetOpenIDConnectEndpoint(url string) func(g *GoCloak) {
 func SetCertCacheInvalidationTime(duration time.Duration) func(g *GoCloak) {
 	return func(g *GoCloak) {
 		g.Config.CertsInvalidateTime = duration
+	}
+}
+
+// WithClientCredentials configures the GoCloak client to use OAuth2 client credentials flow.
+//
+// Access token will be auto-added to the Auth Header for all requests made using this GoCloak client.
+// The token will also be auto-refreshed when necessary.
+func WithClientCredentials(clientID, clientSecret, realm string) func(g *GoCloak) {
+	return func(g *GoCloak) {
+		clientCredentialsConfig := clientcredentials.Config{
+			ClientID:     clientID,
+			ClientSecret: clientSecret,
+			TokenURL:     g.getRealmURL(realm, g.Config.tokenEndpoint),
+		}
+
+		oauth2Client := clientCredentialsConfig.Client(context.Background())
+
+		g.restyClient.SetTransport(oauth2Client.Transport)
 	}
 }
 
