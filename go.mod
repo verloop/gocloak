@@ -1,6 +1,6 @@
-module github.com/Nerzal/gocloak/v13
+module github.com/verloop/gocloak
 
-go 1.23
+go 1.22.0
 
 require (
 	github.com/go-resty/resty/v2 v2.15.3
@@ -11,6 +11,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.28.0
 	golang.org/x/mod v0.21.0
+	golang.org/x/oauth2 v0.26.0
 )
 
 require (

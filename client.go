@@ -18,8 +18,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/mod/semver"
+	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/Nerzal/gocloak/v13/pkg/jwx"
+	"github.com/verloop/gocloak/pkg/jwx"
 )
 
 // GoCloak provides functionalities to talk to Keycloak.
@@ -336,6 +337,24 @@ func SetOpenIDConnectEndpoint(url string) func(g *GoCloak) {
 func SetCertCacheInvalidationTime(duration time.Duration) func(g *GoCloak) {
 	return func(g *GoCloak) {
 		g.Config.CertsInvalidateTime = duration
+	}
+}
+
+// WithClientCredentials configures the GoCloak client to use OAuth2 client credentials flow.
+//
+// Access token will be auto-added to the Auth Header for all requests made using this GoCloak client.
+// The token will also be auto-refreshed when necessary.
+func WithClientCredentials(clientID, clientSecret, realm string) func(g *GoCloak) {
+	return func(g *GoCloak) {
+		clientCredentialsConfig := clientcredentials.Config{
+			ClientID:     clientID,
+			ClientSecret: clientSecret,
+			TokenURL:     g.getRealmURL(realm, g.Config.tokenEndpoint),
+		}
+
+		oauth2Client := clientCredentialsConfig.Client(context.Background())
+		resty := resty.NewWithClient(oauth2Client)
+		g.SetRestyClient(resty)
 	}
 }
 
@@ -2121,6 +2140,21 @@ func (g *GoCloak) GetClients(ctx context.Context, token, realm string, params Ge
 	return result, nil
 }
 
+// GetClientByClientID gets a client by it's client_id (not to be confused with it's UUID-based id)
+func (g *GoCloak) GetClientByClientID(ctx context.Context, token, realm, clientID string) (*Client, error) {
+	var result []*Client
+
+	result, err := g.GetClients(ctx, token, realm, GetClientsParams{ClientID: &clientID})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) > 0 {
+		return result[0], nil
+	}
+	return &Client{}, nil
+}
+
 // GetClientManagementPermissions returns whether client Authorization permissions have been initialized or not and a reference
 // to the managed permissions
 func (g *GoCloak) GetClientManagementPermissions(ctx context.Context, token, realm string, idOfClient string) (*ManagementPermissionRepresentation, error) {
@@ -3374,6 +3408,17 @@ func (g *GoCloak) GetResourceServer(ctx context.Context, token, realm, idOfClien
 	return result, nil
 }
 
+// ImportResourceServer imports a resource server
+func (g *GoCloak) ImportResourceServer(ctx context.Context, token, realm, idOfClient string, resourceServer ResourceServerRepresentation) error {
+	const errMessage = "could not import resource server"
+
+	resp, err := g.GetRequestWithBearerAuth(ctx, token).
+		SetBody(resourceServer).
+		Post(g.getAdminRealmURL(realm, "clients", idOfClient, "authz", "resource-server", "import"))
+
+	return checkForError(resp, err, errMessage)
+}
+
 // UpdateResource updates a resource associated with the client, using access token from admin
 func (g *GoCloak) UpdateResource(ctx context.Context, token, realm, idOfClient string, resource ResourceRepresentation) error {
 	const errMessage = "could not update resource"
@@ -4500,6 +4545,24 @@ func (g *GoCloak) GetUsersManagementPermissions(ctx context.Context, accessToken
 	resp, err := g.GetRequestWithBearerAuth(ctx, accessToken).
 		SetResult(&result).
 		Get(g.getAdminRealmURL(realm, "users-management-permissions"))
+
+	if err := checkForError(resp, err, errMessage); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// PartialImport allows importing a realm partially
+func (g *GoCloak) PartialImport(ctx context.Context, accessToken string, realm RealmRepresentation) (*PartialImportResult, error) {
+	const errMessage = "could not import realm partially"
+
+	var result PartialImportResult
+
+	resp, err := g.GetRequestWithBearerAuth(ctx, accessToken).
+		SetResult(&result).
+		SetBody(realm).
+		Post(g.getAdminRealmURL(PString(realm.Realm), "partialImport"))
 
 	if err := checkForError(resp, err, errMessage); err != nil {
 		return nil, err
