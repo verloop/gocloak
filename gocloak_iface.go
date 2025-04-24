@@ -79,7 +79,7 @@ type GoCloakIface interface {
 	// RevokeUserConsents revokes the given user consent.
 	RevokeUserConsents(ctx context.Context, accessToken, realm, userID, clientID string) error
 	// LogoutUserSession logs out a single sessions of a user given a session id
-	LogoutUserSession(ctx context.Context, accessToken, realm, session string) error
+	LogoutUserSession(ctx context.Context, accessToken, realm, session string, params ...LogoutUserSessionParams) error
 	// ExecuteActionsEmail executes an actions email
 	ExecuteActionsEmail(ctx context.Context, token, realm string, params ExecuteActionsEmail) error
 	// SendVerifyEmail sends a verification e-mail to a user.
@@ -578,4 +578,6 @@ type GoCloakIface interface {
 	UpdateUsersManagementPermissions(ctx context.Context, accessToken, realm string, managementPermissions ManagementPermissionRepresentation) (*ManagementPermissionRepresentation, error)
 	// GetUsersManagementPermissions returns the management permissions for users
 	GetUsersManagementPermissions(ctx context.Context, accessToken, realm string) (*ManagementPermissionRepresentation, error)
+	PartialImport(ctx context.Context, accessToken string, realm RealmRepresentation) (*PartialImportResult, error)
+	GetClientByClientID(ctx context.Context, token, realm, clientID string) (*Client, error)
 }

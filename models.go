@@ -1446,10 +1446,17 @@ type GetClientUserSessionsParams struct {
 	Max   *int `json:"max,string,omitempty"`
 }
 
+// PartialImportResult represents the response from Realm PartialImport API
 type PartialImportResult struct {
 	Overwritten *int32 `json:"overwritten,omitempty"`
 	Added       *int32 `json:"added,omitempty"`
 	Skipped     *int32 `json:"skipped,omitempty"`
+}
+
+// LogoutUserSessionParams represents the optional parameters while logging out a user session
+type LogoutUserSessionParams struct {
+	// set to true if session being logged out is an offline session
+	IsOffline *bool `json:"isOffline,string,omitempty"`
 }
 
 // prettyStringStruct returns struct formatted into pretty string
@@ -1546,3 +1553,5 @@ func (v *CredentialRepresentation) String() string                  { return pre
 func (v *RequiredActionProviderRepresentation) String() string      { return prettyStringStruct(v) }
 func (v *BruteForceStatus) String() string                          { return prettyStringStruct(v) }
 func (v *GetClientUserSessionsParams) String() string               { return prettyStringStruct(v) }
+func (v *PartialImportResult) String() string                       { return prettyStringStruct(v) }
+func (v *LogoutUserSessionParams) String() string                   { return prettyStringStruct(v) }

@@ -768,10 +768,21 @@ func (g *GoCloak) RevokeUserConsents(ctx context.Context, accessToken, realm, us
 }
 
 // LogoutUserSession logs out a single sessions of a user given a session id
-func (g *GoCloak) LogoutUserSession(ctx context.Context, accessToken, realm, session string) error {
+func (g *GoCloak) LogoutUserSession(ctx context.Context, accessToken, realm, session string, params ...LogoutUserSessionParams) error {
 	const errMessage = "could not logout"
 
+	queryParams := map[string]string{}
+	if len(params) > 0 {
+		var err error
+
+		queryParams, err = GetQueryParams(params[0])
+		if err != nil {
+			return errors.Wrap(err, errMessage)
+		}
+	}
+
 	resp, err := g.GetRequestWithBearerAuth(ctx, accessToken).
+		SetQueryParams(queryParams).
 		Delete(g.getAdminRealmURL(realm, "sessions", session))
 
 	return checkForError(resp, err, errMessage)
